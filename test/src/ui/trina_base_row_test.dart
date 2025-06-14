@@ -16,9 +16,9 @@ void main() {
   List<TrinaColumn> columns;
   List<TrinaRow> rows;
   final resizingNotifier = ChangeNotifier();
+  const configuration = TrinaGridConfiguration();
 
   setUp(() {
-    const configuration = TrinaGridConfiguration();
     stateManager = MockTrinaGridStateManager();
     streamNotifier = PublishSubject<TrinaNotifierEvent>();
     when(stateManager.streamNotifier).thenAnswer((_) => streamNotifier);
@@ -27,6 +27,8 @@ void main() {
     when(stateManager.style).thenReturn(configuration.style);
     when(stateManager.localeText).thenReturn(const TrinaGridLocaleText());
     when(stateManager.rowHeight).thenReturn(45);
+    when(stateManager.rowTotalHeight)
+        .thenReturn(TrinaGridSettings.rowTotalHeight);
     when(stateManager.isSelecting).thenReturn(true);
     when(stateManager.hasCurrentSelectingPosition).thenReturn(true);
     when(stateManager.isEditing).thenReturn(true);
@@ -49,6 +51,7 @@ void main() {
     bool isSelectedRow = false,
     bool isCurrentCell = false,
     bool isSelectedCell = false,
+    bool enableCellBorderHorizontal = false,
   }) {
     return TrinaWidgetTestHelper(
       'build row widget.',
@@ -64,7 +67,8 @@ void main() {
         when(stateManager.isCurrentCell(any)).thenReturn(isCurrentCell);
         when(stateManager.isSelectedCell(any, any, any))
             .thenReturn(isSelectedCell);
-
+        when(stateManager.style).thenReturn(configuration.style
+            .copyWith(enableCellBorderHorizontal: enableCellBorderHorizontal));
         // given
         columns = ColumnHelper.textColumn('header', count: 3);
         rows = RowHelper.count(10, columns);
@@ -155,6 +159,26 @@ void main() {
         rowContainerDecoration.border!.bottom.width,
         TrinaGridSettings.rowBorderWidth,
       );
+    },
+  );
+
+  buildRowWidget(enableCellBorderHorizontal: false).test(
+    'When enableCellBorderHorizontal is false, row height should equal stateManager.rowTotalHeight',
+    (tester) async {
+      final cellFinder = find.byType(TrinaBaseCell).first;
+
+      final size = tester.getSize(cellFinder);
+      expect(size.height, stateManager.rowTotalHeight);
+    },
+  );
+
+  buildRowWidget(enableCellBorderHorizontal: true).test(
+    'When enableCellBorderHorizontal is true, row height should equal stateManager.rowHeight',
+    (tester) async {
+      final cellFinder = find.byType(TrinaBaseCell).first;
+
+      final size = tester.getSize(cellFinder);
+      expect(size.height, TrinaGridSettings.rowHeight);
     },
   );
 }
