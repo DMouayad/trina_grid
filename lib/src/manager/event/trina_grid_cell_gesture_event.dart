@@ -60,7 +60,7 @@ class TrinaGridCellGestureEvent extends TrinaGridEvent {
     if (stateManager.keyPressed.shift) {
       _onSelectionWithShift(stateManager);
     } else if (stateManager.keyPressed.ctrl) {
-      stateManager.toggleSelectingRow(rowIdx);
+      _onSelectionWithCTRL(stateManager);
     }
   }
 
@@ -76,6 +76,23 @@ class TrinaGridCellGestureEvent extends TrinaGridEvent {
     );
 
     _handleRangeSelectionIfSelectingRows(stateManager);
+  }
+
+  void _onSelectionWithCTRL(TrinaGridStateManager stateManager) {
+    if (stateManager.selectingMode.isCellWithCtrl) {
+      //TODO: implement cell selection with Ctrl
+    }
+    if (stateManager.selectingMode.isRowWithCtrl) {
+      final int? currentRowIdx = stateManager.currentRowIdx;
+      // If no rows are currently selected and the current row is different from the tapped row,
+      // ensure the current row is included in the selection.
+      if (stateManager.selectedRows.isEmpty && currentRowIdx != rowIdx) {
+        stateManager.toggleSelectingRow(currentRowIdx);
+      }
+      // Always toggle the selection state of the tapped row.
+      stateManager.toggleSelectingRow(rowIdx);
+    }
+    stateManager.handleOnSelected();
   }
 
   void _handleNormalTap(TrinaGridStateManager stateManager) {
