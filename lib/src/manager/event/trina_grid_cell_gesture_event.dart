@@ -83,6 +83,11 @@ class TrinaGridCellGestureEvent extends TrinaGridEvent {
       stateManager.setEditing(true);
     } else {
       stateManager.setCurrentCell(cell, rowIdx);
+      // If selection activates with ctrl\cmd, then selected cells\rows is cleared by
+      // `stateManager.setCurrentCell`, so we should call handleOnSelected.
+      if (stateManager.selectingMode.isSelectWithCTRL) {
+        stateManager.handleOnSelected();
+      }
     }
   }
 
