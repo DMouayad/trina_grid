@@ -653,7 +653,7 @@ mixin ColumnState implements ITrinaGridState {
     }
 
     if (limitHideColumn(column, hide)) {
-      column.frozen = TrinaColumnFrozen.none;
+      // column.frozen = TrinaColumnFrozen.none;
     }
 
     column.hide = hide;
@@ -1007,7 +1007,7 @@ mixin ColumnState implements ITrinaGridState {
       }
 
       if (limitHideColumn(column, hide, accumulateWidth: accumulateWidth)) {
-        column.frozen = TrinaColumnFrozen.none;
+        // column.frozen = TrinaColumnFrozen.none;
       }
 
       if (column.frozen.isFrozen) {
