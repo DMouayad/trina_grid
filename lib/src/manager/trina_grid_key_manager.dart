@@ -15,24 +15,12 @@ import 'package:rxdart/rxdart.dart';
 /// arrow keys, backspace, etc. are not input (characters are input normally)
 /// https://github.com/flutter/flutter/issues/93873
 class TrinaGridKeyEventResult {
-  bool _skip = false;
+  bool _handled = false;
 
-  bool get isSkip => _skip;
+  bool get isHandled => _handled;
 
-  KeyEventResult skip(KeyEventResult result) {
-    _skip = true;
-
-    return result;
-  }
-
-  KeyEventResult consume(KeyEventResult result) {
-    if (_skip) {
-      _skip = false;
-
-      return KeyEventResult.ignored;
-    }
-
-    return result;
+  void set(bool handled) {
+    _handled = handled;
   }
 }
 
@@ -75,13 +63,17 @@ class TrinaGridKeyManager {
   }
 
   void _handler(TrinaKeyManagerEvent keyEvent) {
-    if (keyEvent.isKeyUpEvent) return;
+    if (keyEvent.isKeyUpEvent) {
+      eventResult.set(false);
+      return;
+    }
 
     if (stateManager.configuration.shortcut.handle(
       keyEvent: keyEvent,
       stateManager: stateManager,
       state: HardwareKeyboard.instance,
     )) {
+      eventResult.set(true);
       return;
     }
 
